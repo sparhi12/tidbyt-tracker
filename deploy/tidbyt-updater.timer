@@ -1,0 +1,10 @@
+[Unit]
+Description=Poll GitHub for Tidbyt Flight Tracker Updates Every 3 Minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=3min
+Unit=tidbyt-updater.service
+
+[Install]
+WantedBy=timers.target
