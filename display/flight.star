@@ -1,32 +1,29 @@
 """
 Tidbyt Flight Tracker Display
 Resolution: 64x32
-Left Half: 5 rows of flight information (Row 3 static without scrolling)
-Right Half: Real-time 32x32 analog clock
+Left Half (32x32): 5 rows of flight information (Left-anchored, no clipping)
+Right Half (32x32): Real-time analog clock
 """
 
 load("encoding/base64.star", "base64")
 load("render.star", "render")
 
 def main(config):
-    # Left Half Inputs
-    flight_no = config.get("flight_no", "SCANNING")
-    airline = config.get("airline", "Seattle Skies")
-    # Row 3: e.g. "NW -> 0.1m" (Static, no marquee)
-    row3_text = config.get("row3_text", "NW -> 0.1m")
-    route_codes = config.get("route_codes", "SEA > ---")
-    route_cities = config.get("route_cities", "Seattle > Clear Sky")
-
-    # Right Half: Base64-encoded 32x32 PNG of the analog clock
+    flight_no = config.get("flight_no", "SCANNING").strip()
+    airline = config.get("airline", "Seattle Skies").strip()
+    row3_text = config.get("row3_text", "NW -> 0.1m").strip()
+    route_codes = config.get("route_codes", "SEA > ---").strip()
+    route_cities = config.get("route_cities", "Seattle > Clear Sky").strip()
     clock_b64 = config.get("clock_b64", "")
 
-    # Left Column: 32px wide x 32px high, containing 5 rows (6px each, with slight padding)
+    # Left Column: exactly 32px wide x 32px high, containing 5 rows (6px each)
+    # Using cross_align = 'start' to ensure everything anchors flush to the left edge
     left_column = render.Column(
         expanded = True,
         main_align = "space_between",
         cross_align = "start",
         children = [
-            # Row 1: Flight Number
+            # Row 1: Flight Number (Centered, gold)
             render.Box(
                 width = 32,
                 height = 6,
@@ -36,7 +33,8 @@ def main(config):
                     color = "#FFD700",
                 ),
             ),
-            # Row 2: Airline Name (Marquee for long names)
+            # Row 2: Airline Name (Flush left, sky blue)
+            # Fits statically for short names ("Alaska"), scrolls only if > 32px
             render.Box(
                 width = 32,
                 height = 6,
@@ -49,17 +47,20 @@ def main(config):
                     ),
                 ),
             ),
-            # Row 3: Compass direction + distance (e.g. "NW -> 0.1m", strictly static without scrolling)
-            render.Box(
-                width = 32,
-                height = 6,
-                child = render.Text(
-                    content = row3_text,
-                    font = "tom-thumb",
-                    color = "#4ADE80",
-                ),
+            # Row 3: Direction + Distance (e.g. "NW -> 0.1m", static, green, with 1px left padding to prevent edge cutting)
+            render.Row(
+                children = [
+                    render.Padding(
+                        pad = (1, 0, 0, 0),
+                        child = render.Text(
+                            content = row3_text,
+                            font = "tom-thumb",
+                            color = "#4ADE80",
+                        ),
+                    ),
+                ],
             ),
-            # Row 4: Origin > Destination Codes (Marquee)
+            # Row 4: Origin > Destination Codes (Marquee, amber)
             render.Box(
                 width = 32,
                 height = 6,
@@ -72,7 +73,7 @@ def main(config):
                     ),
                 ),
             ),
-            # Row 5: Origin > Destination Full City Names (Marquee)
+            # Row 5: Origin > Destination Full City Names (Marquee, soft white)
             render.Box(
                 width = 32,
                 height = 6,

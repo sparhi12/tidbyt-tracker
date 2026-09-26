@@ -1,7 +1,7 @@
 """
 Flight route resolver.
-Fetches route (Origin-Destination) from HexDB API and maps codes to city names
-using the local airport database, with local SQLite and in-memory caching.
+Queries adsbdb.com API (primary) and HexDB API (fallback) to resolve
+Origin > Destination IATA codes and full city names with SQLite and memory caching.
 """
 
 import json
@@ -18,10 +18,21 @@ logger = logging.getLogger(__name__)
 
 CACHE_TTL_SECONDS = 6 * 3600  # 6 hours cache per callsign
 
+# Common IATA to ICAO mapping for fallback queries
+IATA_TO_ICAO = {
+    "AS": "ASA", "DL": "DAL", "UA": "UAL", "AA": "AAL", "WN": "SWA",
+    "B6": "JBU", "F9": "FFT", "NK": "NKS", "HA": "HAL", "AC": "ACA",
+    "WS": "WJA", "BA": "BAW", "AF": "AFR", "LH": "DLH", "NH": "ANA",
+    "JL": "JAL", "KE": "KAL", "BR": "EVA", "CI": "CAL", "CX": "CPA",
+    "SQ": "SIA", "EK": "UAE", "QR": "QTR", "QX": "QXE", "OO": "SKW",
+}
+
 class RouteResolver:
     def __init__(self, db_path: str = "routes_cache.db"):
         self.db_path = db_path
         self._memory_cache: Dict[str, Tuple[str, str, float]] = {}
+        self.session = requests.Session()
+        self.session.headers.update({"User-Agent": "TidbytFlightTracker/2.0"})
         self._init_db()
 
     def _init_db(self):
@@ -42,7 +53,7 @@ class RouteResolver:
     def get_route(self, callsign: Optional[str]) -> Tuple[str, str]:
         """
         Returns (route_codes, route_cities).
-        Example: ('PDX > LAX', 'Portland > Los Angeles')
+        Example: ('SEA > SFO', 'Seattle > San Francisco')
         """
         if not callsign:
             return ("SEA AREA", "Overhead Seattle")
@@ -76,35 +87,85 @@ class RouteResolver:
         except Exception as e:
             logger.debug(f"SQLite lookup error for {cs}: {e}")
 
-        # 3. Query HexDB API
-        url = f"https://hexdb.io/api/v1/route/icao/{cs}"
-        headers = {"User-Agent": "TidbytFlightTracker/2.0"}
+        # 3. Query primary source: api.adsbdb.com (real-time flight routes)
+        route = self._query_adsbdb(cs)
+        if route:
+            self._store_cache(cs, route[0], route[1])
+            return route
 
+        # Try alternative callsign format (e.g. AS1762 <-> ASA1762)
+        alt_cs = self._get_alternate_callsign(cs)
+        if alt_cs:
+            route = self._query_adsbdb(alt_cs)
+            if route:
+                self._store_cache(cs, route[0], route[1])
+                return route
+
+        # 4. Query secondary source: HexDB API
+        route = self._query_hexdb(cs)
+        if route:
+            self._store_cache(cs, route[0], route[1])
+            return route
+
+        if alt_cs:
+            route = self._query_hexdb(alt_cs)
+            if route:
+                self._store_cache(cs, route[0], route[1])
+                return route
+
+        # Fallback if route unknown
+        fallback = ("SEA AREA", "En Route")
+        self._store_cache(cs, fallback[0], fallback[1])
+        return fallback
+
+    def _query_adsbdb(self, callsign: str) -> Optional[Tuple[str, str]]:
+        url = f"https://api.adsbdb.com/v0/callsign/{callsign}"
         try:
-            resp = requests.get(url, headers=headers, timeout=3.0)
+            resp = self.session.get(url, timeout=3.0)
+            if resp.status_code == 200:
+                data = resp.json()
+                flightroute = data.get("response", {}).get("flightroute")
+                if flightroute:
+                    orig = flightroute.get("origin") or {}
+                    dest = flightroute.get("destination") or {}
+
+                    orig_code = orig.get("iata_code") or orig.get("icao_code", "")
+                    dest_code = dest.get("iata_code") or dest.get("icao_code", "")
+
+                    orig_city = orig.get("municipality") or orig.get("name", "")
+                    dest_city = dest.get("municipality") or dest.get("name", "")
+
+                    if orig_code and dest_code:
+                        return (f"{orig_code} > {dest_code}", f"{orig_city} > {dest_city}")
+        except Exception as e:
+            logger.debug(f"adsbdb lookup failed for {callsign}: {e}")
+        return None
+
+    def _query_hexdb(self, callsign: str) -> Optional[Tuple[str, str]]:
+        url = f"https://hexdb.io/api/v1/route/icao/{callsign}"
+        try:
+            resp = self.session.get(url, timeout=3.0)
             if resp.status_code == 200:
                 data = resp.json()
                 raw_route = data.get("route", "")
                 if raw_route and "-" in raw_route:
                     parts = raw_route.split("-")
-                    orig_raw = parts[0].strip()
-                    dest_raw = parts[1].strip()
-
-                    orig_code, orig_city = resolve_airport(orig_raw)
-                    dest_code, dest_city = resolve_airport(dest_raw)
-
-                    route_codes = f"{orig_code} > {dest_code}"
-                    route_cities = f"{orig_city} > {dest_city}"
-
-                    self._store_cache(cs, route_codes, route_cities)
-                    return (route_codes, route_cities)
+                    orig_code, orig_city = resolve_airport(parts[0].strip())
+                    dest_code, dest_city = resolve_airport(parts[1].strip())
+                    return (f"{orig_code} > {dest_code}", f"{orig_city} > {dest_city}")
         except Exception as e:
-            logger.debug(f"HexDB API lookup failed for {cs}: {e}")
+            logger.debug(f"hexdb lookup failed for {callsign}: {e}")
+        return None
 
-        # Fallback if route not known
-        fallback = ("SEA AREA", "En Route")
-        self._store_cache(cs, fallback[0], fallback[1])
-        return fallback
+    def _get_alternate_callsign(self, cs: str) -> Optional[str]:
+        # If IATA 2-letter (e.g. AS1762), convert to ICAO (ASA1762)
+        if len(cs) > 2 and cs[:2] in IATA_TO_ICAO and cs[2].isdigit():
+            return IATA_TO_ICAO[cs[:2]] + cs[2:]
+        # If ICAO 3-letter (e.g. ASA1762), convert to IATA (AS1762)
+        for iata, icao in IATA_TO_ICAO.items():
+            if cs.startswith(icao) and len(cs) > 3 and cs[3].isdigit():
+                return iata + cs[3:]
+        return None
 
     def _store_cache(self, callsign: str, codes: str, cities: str):
         now = time.time()

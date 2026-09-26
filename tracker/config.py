@@ -36,6 +36,9 @@ class Config:
     # Display update interval
     POLL_INTERVAL_SECONDS = int(os.getenv("POLL_INTERVAL_SECONDS", "10"))
 
+    # Clock settings: show or hide jumping second hand
+    SHOW_SECOND_HAND = os.getenv("SHOW_SECOND_HAND", "false").lower() in ("true", "1", "yes")
+
     # Flight selection priority: Eastern hemisphere (0° to 180° / N -> E -> S)
     EASTERN_PRIORITY = os.getenv("EASTERN_PRIORITY", "true").lower() in ("true", "1", "yes")
 

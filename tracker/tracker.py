@@ -51,7 +51,7 @@ class FlightTrackerDaemon:
         now_dt = datetime.now()
 
         # 1. Generate 32x32 analog clock PNG
-        clock_b64 = generate_analog_clock(now_dt)
+        clock_b64 = generate_analog_clock(now_dt, show_second_hand=self.config.SHOW_SECOND_HAND)
 
         # 2. Get latest flight data
         flight_data = self.flight_service.get_current_display_data()
@@ -114,10 +114,10 @@ def main():
 
     if args.test:
         logger.info("Running self-test with simulated flight...")
-        clock_b64 = generate_analog_clock()
+        clock_b64 = generate_analog_clock(show_second_hand=daemon.config.SHOW_SECOND_HAND)
         test_data = {
             "flight_no": "AS1762",
-            "airline": "Alaska Airlines",
+            "airline": "Alaska",
             "row3_text": "NW -> 0.1m",
             "route_codes": "PDX > LAX",
             "route_cities": "Portland > Los Angeles",

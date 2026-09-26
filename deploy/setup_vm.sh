@@ -29,13 +29,19 @@ sudo apt-get install -y \
 # 2. Install Pixlet binary (Linux amd64)
 if ! command -v pixlet &> /dev/null; then
     echo "[2/5] Downloading and installing Pixlet (Linux amd64)..."
-    PIXLET_VER="0.33.8"
-    TMP_ARCHIVE="/tmp/pixlet_${PIXLET_VER}.tar.gz"
-    wget -q "https://github.com/tidbyt/pixlet/releases/download/v${PIXLET_VER}/pixlet_${PIXLET_VER}_linux_amd64.tar.gz" -O "$TMP_ARCHIVE"
-    sudo tar -xzf "$TMP_ARCHIVE" -C /usr/local/bin pixlet
+    PIXLET_TAG=$(curl -s https://api.github.com/repos/tidbyt/pixlet/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' || echo "v0.34.0")
+    if [ -z "$PIXLET_TAG" ]; then PIXLET_TAG="v0.34.0"; fi
+    PIXLET_VER="${PIXLET_TAG#v}"
+    
+    TMP_DIR=$(mktemp -d)
+    TAR_URL="https://github.com/tidbyt/pixlet/releases/download/${PIXLET_TAG}/pixlet_${PIXLET_VER}_linux_amd64.tar.gz"
+    echo "Fetching $TAR_URL..."
+    curl -fsSL "$TAR_URL" -o "$TMP_DIR/pixlet.tar.gz"
+    tar -xzf "$TMP_DIR/pixlet.tar.gz" -C "$TMP_DIR"
+    sudo mv "$TMP_DIR/pixlet" /usr/local/bin/pixlet
     sudo chmod +x /usr/local/bin/pixlet
-    rm -f "$TMP_ARCHIVE"
-    echo "Pixlet installed successfully: $(pixlet version || echo 'ready')"
+    rm -rf "$TMP_DIR"
+    echo "Pixlet installed successfully: $(pixlet version 2>/dev/null || echo 'ready')"
 else
     echo "[2/5] Pixlet is already installed: $(which pixlet)"
 fi
@@ -65,7 +71,7 @@ sudo cp deploy/tidbyt-updater.service /etc/systemd/system/
 sudo cp deploy/tidbyt-updater.timer /etc/systemd/system/
 
 # Substitute actual application directory and user in service files
-CURRENT_USER=$(whoami)
+CURRENT_USER="${SUDO_USER:-$(whoami)}"
 sudo sed -i "s|__APP_DIR__|$APP_DIR|g" /etc/systemd/system/tidbyt-tracker.service
 sudo sed -i "s|__USER__|$CURRENT_USER|g" /etc/systemd/system/tidbyt-tracker.service
 sudo sed -i "s|__APP_DIR__|$APP_DIR|g" /etc/systemd/system/tidbyt-updater.service
