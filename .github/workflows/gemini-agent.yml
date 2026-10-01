@@ -35,4 +35,19 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx -y @google/gemini-cli -p "Read issue #${{ github.event.issue.number }} (Title: '${{ github.event.issue.title }}', Body: '${{ github.event.issue.body }}', Comment: '${{ github.event.comment.body }}'). Inspect the repository, fix any reported bugs, update the relevant files directly, and make a clean git commit." -y --skip-trust
+          npx -y @google/gemini-cli -m gemini-2.5-flash -p "Read issue #${{ github.event.issue.number }} (Title: '${{ github.event.issue.title }}', Body: '${{ github.event.issue.body }}', Comment: '${{ github.event.comment.body }}'). Inspect the repository, fix any reported bugs, and modify the code directly." -y --skip-trust
+
+      - name: Create Pull Request with Fixes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            BRANCH_NAME="gemini-fix-issue-${{ github.event.issue.number }}"
+            git checkout -b "$BRANCH_NAME"
+            git add .
+            git commit -m "fix: resolution for issue #${{ github.event.issue.number }} via Gemini CLI"
+            git push origin "$BRANCH_NAME" --force
+            gh pr create --title "Fix for Issue #${{ github.event.issue.number }}" --body "Automated fix created by @gemini-cli for issue #${{ github.event.issue.number }}." --head "$BRANCH_NAME" --base main
+          else
+            gh issue comment ${{ github.event.issue.number }} --body "🤖 Gemini CLI inspected the repository but found no code changes to commit."
+          fi
