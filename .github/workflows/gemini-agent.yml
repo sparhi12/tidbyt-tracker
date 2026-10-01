@@ -1,53 +1,30 @@
-name: Gemini CLI Agent
+name: Gemini Issue Handler
 
 on:
-  issue_comment:
-    types: [created]
   issues:
-    types: [opened]
+    types: [opened, labeled]
 
 jobs:
-  gemini-assistant:
-    if: contains(github.event.comment.body, '@gemini-cli') || contains(github.event.issue.body, '@gemini-cli')
+  run-gemini:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       issues: write
-      pull-requests: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
-      - name: Configure Git User
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Run Gemini CLI Agent
+      - name: Execute Gemini CLI
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TERM: xterm-256color
         run: |
-          npx -y @google/gemini-cli -m gemini-2.5-flash -p "Read issue #${{ github.event.issue.number }} (Title: '${{ github.event.issue.title }}', Body: '${{ github.event.issue.body }}', Comment: '${{ github.event.comment.body }}'). Inspect the repository, fix any reported bugs, and modify the code directly." -y --skip-trust
-
-      - name: Create Pull Request with Fixes
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            BRANCH_NAME="gemini-fix-issue-${{ github.event.issue.number }}"
-            git checkout -b "$BRANCH_NAME"
-            git add .
-            git commit -m "fix: resolution for issue #${{ github.event.issue.number }} via Gemini CLI"
-            git push origin "$BRANCH_NAME" --force
-            gh pr create --title "Fix for Issue #${{ github.event.issue.number }}" --body "Automated fix created by @gemini-cli for issue #${{ github.event.issue.number }}." --head "$BRANCH_NAME" --base main
-          else
-            gh issue comment ${{ github.event.issue.number }} --body "🤖 Gemini CLI inspected the repository but found no code changes to commit."
-          fi
+          npx -y @google/gemini-cli \
+            -m gemini-3.8-flash \
+            -p "Read issue #${{ github.event.issue.number }} and summarize the core problem."
