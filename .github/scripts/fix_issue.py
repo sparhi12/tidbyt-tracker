@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import glob
 from google import genai
 
 def main():
@@ -59,9 +58,8 @@ OUTPUT FORMAT REQUIREMENTS:
 """
 
     print("Sending single API call to Gemini...")
-    # Use gemini-2.5-flash for fast, low-latency, free-tier compliance
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-3.8-flash",
         contents=prompt,
         config={
             "response_mime_type": "application/json"
@@ -78,7 +76,8 @@ OUTPUT FORMAT REQUIREMENTS:
             path = item.get("path")
             content = item.get("content")
             if path and content is not None:
-                os.makedirs(os.path.dirname(path), exist_ok=True) if os.path.dirname(path) else None
+                if os.path.dirname(path):
+                    os.makedirs(os.path.dirname(path), exist_ok=True)
                 with open(path, "w", encoding="utf-8") as f:
                     f.write(content)
                 print(f"Updated file: {path}")
