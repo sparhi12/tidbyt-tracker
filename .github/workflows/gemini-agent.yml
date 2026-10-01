@@ -35,4 +35,4 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx -y @google/gemini-cli fix --issue ${{ github.event.issue.number }}
+          npx -y @google/gemini-cli -p "Read issue #${{ github.event.issue.number }} (Title: '${{ github.event.issue.title }}', Body: '${{ github.event.issue.body }}', Comment: '${{ github.event.comment.body }}'). Inspect the repository, fix any reported bugs, update the relevant files directly, and make a clean git commit." -y --skip-trust
