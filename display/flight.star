@@ -38,15 +38,18 @@ def main(config):
                     color = "#FFD700",
                 ),
             ),
-            # Row 2: Route Codes (Static, Amber, e.g. "SEA>SFO")
-            render.Box(
-                width = 32,
-                height = 6,
-                child = render.Text(
-                    content = route_codes,
-                    font = "tom-thumb",
-                    color = "#FB923C",
-                ),
+            # Row 2: Route Codes (Static, Amber, e.g. "SEA>SFO", flush left with 1px padding)
+            render.Row(
+                children = [
+                    render.Padding(
+                        pad = (1, 0, 0, 0),
+                        child = render.Text(
+                            content = route_codes,
+                            font = "tom-thumb",
+                            color = "#FB923C",
+                        ),
+                    ),
+                ],
             ),
             # Row 3: Direction + Arrow + Distance (Static, Green, e.g. "Nw<^0.1m")
             render.Row(

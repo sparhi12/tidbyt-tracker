@@ -73,12 +73,12 @@ def generate_analog_clock(dt: Optional[datetime] = None, show_second_hand: bool 
             if 0 <= dx < 32 and 0 <= dy < 32:
                 pixels[dx, dy] = (100, 116, 139, 210)
 
-    # 3. Hour Hand: length 6.0 px, width 2px, vibrant red
+    # 3. Hour Hand: length 6.0 px, width 1px, vibrant red
     hour_val = (dt.hour % 12) + (dt.minute / 60.0)
     hour_rad = math.radians(hour_val * 30.0 - 90.0)
     hx = center_x + 6.0 * math.cos(hour_rad)
     hy = center_y + 6.0 * math.sin(hour_rad)
-    draw.line([(round(center_x), round(center_y)), (round(hx), round(hy))], fill=(239, 68, 68, 255), width=2)
+    draw.line([(round(center_x), round(center_y)), (round(hx), round(hy))], fill=(239, 68, 68, 255), width=1)
 
     # 4. Minute Hand: length 10.0 px, width 1px, vibrant sky blue
     min_val = dt.minute + (dt.second / 60.0)

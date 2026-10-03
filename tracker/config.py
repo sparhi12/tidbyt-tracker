@@ -31,7 +31,7 @@ class Config:
     # Geographic reference point: Denny Way & Westlake Ave, Seattle
     REF_LAT = float(os.getenv("REF_LAT", "47.6186"))
     REF_LON = float(os.getenv("REF_LON", "-122.3365"))
-    MAX_RADIUS_MILES = float(os.getenv("MAX_RADIUS_MILES", "15.0"))
+    MAX_RADIUS_MILES = float(os.getenv("MAX_RADIUS_MILES", "25.0"))
 
     # Display update interval
     POLL_INTERVAL_SECONDS = int(os.getenv("POLL_INTERVAL_SECONDS", "10"))

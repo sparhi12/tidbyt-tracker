@@ -10,40 +10,41 @@ The screen is split into two 32x32 pixel halves:
 
 ```
 +--------------------------------+--------------------------------+
-| AS1762                         |             __--__             |
-| Alaska Airlines                |            /  12  \            |
-| NW -> 0.1m                     |           | 9  •   3|          |
-| PDX > LAX                      |            \   6  /            |
-| Portland > Los Angeles         |             ^--__^             |
+| ASA1762                        |             __--__             |
+| SEA>SFO                        |            /  12  \            |
+| Nw<^0.1m                       |           | 9  •   3|          |
+| Alaska                         |            \   6  /            |
+| Seattle > San Francisco        |             ^--__^             |
 +--------------------------------+--------------------------------+
       Left Half (32x32)                  Right Half (32x32)
        Flight Information                    Analog Clock
 ```
 
 ### Left Half (5 Rows):
-1. **Row 1**: Flight Number (e.g. `AS1762`) in gold (`#FFD700`).
-2. **Row 2**: Airline Name (e.g. `Alaska Airlines`) with smooth Marquee scroll in sky blue (`#38BDF8`).
-3. **Row 3**: 8-point compass direction & distance relative to Denny Way & Westlake Ave Seattle formatted as **`NW -> 0.1m`** in green (`#4ADE80`). Strictly static without scrolling.
-4. **Row 4**: Origin > Destination IATA codes (e.g. `PDX > LAX`) in amber (`#FB923C`).
-5. **Row 5**: Origin > Destination full city names (e.g. `Portland > Los Angeles`) with Marquee scroll in soft white (`#E2E8F0`).
+1. **Row 1 (Static)**: Flight Number (e.g. `ASA1762`) in gold (`#FFD700`), centered.
+2. **Row 2 (Static)**: Origin > Destination IATA codes (e.g. `SEA>SFO`) in amber (`#FB923C`), left-aligned with 1px padding.
+3. **Row 3 (Static)**: 8-point compass direction, directional arrow pointing to plane (`^`, `^>`, `>`, `v>`, `v`, `<v`, `<`, `<^`), and distance (e.g. **`Nw<^0.1m`**, with lowercase `w` for West) in green (`#4ADE80`). Compact format without spaces to prevent clipping.
+4. **Row 4 (Scrolling Marquee)**: Airline brand name (e.g. `Alaska`) with smooth Marquee scroll in sky blue (`#38BDF8`).
+5. **Row 5 (Scrolling Marquee)**: Origin > Destination full city names (e.g. `Seattle > San Francisco`) with Marquee scroll in soft white (`#E2E8F0`).
 
 ### Right Half:
-- **Real-Time 32x32 Analog Clock**: Generated dynamically with bezel rim, cardinal hour ticks (12, 3, 6, 9), white hour hand, cyan minute hand, and crimson second hand.
+- **Real-Time 32x32 Analog Clock**: Generated dynamically with pixel-perfect Euclidean circle dial, radial cardinal hour ticks (12, 3, 6, 9), 1-pixel red hour hand, 1-pixel sky blue minute hand, and optional red second hand. Configured to display local timezone time (`TIMEZONE=America/Los_Angeles`).
 
 ### Standby Mode:
 When no aircraft are in the overhead airspace, the Tidbyt displays:
-- Row 1: `SEATTLE`
-- Row 2: `Clear Sky`
-- Row 3: `NW -> 0.0m`
-- Row 4: `SEA AREA`
-- Row 5: `Denny & Westlake`
-- Right Half: Analog clock continues showing live real-time hours, minutes, and seconds.
+- Row 1: `SCANNING`
+- Row 2: `SEA>---`
+- Row 3: `Nw<^0.0m`
+- Row 4: `Seattle Skies`
+- Row 5: `Overhead Seattle`
+- Right Half: Analog clock continues showing live real-time local hours, minutes, and seconds.
 
 ---
 
 ## 🧭 Flight Selection & Priority
 
 - **Target Location**: Denny Way & Westlake Ave, Seattle (`47.6186° N, 122.3365° W`).
+- **Default Radius**: `25.0` miles.
 - **Eastern Hemisphere Priority**: Priority is given to aircraft in the North $\to$ East $\to$ South right hemisphere ($0^\circ \le \theta \le 180^\circ$). The closest aircraft in this sector is tracked. If no aircraft are in the eastern sector, the closest aircraft overall is chosen.
 
 ---
@@ -80,8 +81,8 @@ git push -u origin main
    - **Disk**: 10 GB or 30 GB standard persistent disk
 2. SSH into your VM and run:
    ```bash
-   git clone https://github.com/<your-username>/<your-repo-name>.git /opt/tidbyt-flight-tracker
-   cd /opt/tidbyt-flight-tracker
+   git clone https://github.com/<your-username>/<your-repo-name>.git ~/tidbyt-tracker
+   cd ~/tidbyt-tracker
    sudo ./deploy/setup_vm.sh
    ```
 
@@ -96,6 +97,8 @@ TIDBYT_DEVICE_ID=your_device_id_here
 TIDBYT_API_KEY=your_tidbyt_api_key_here
 OPENSKY_USERNAME=your_opensky_username
 OPENSKY_PASSWORD=your_opensky_password
+TIMEZONE=America/Los_Angeles
+MAX_RADIUS_MILES=25.0
 ```
 
 ### 4. Start the Service
@@ -108,7 +111,7 @@ sudo journalctl -u tidbyt-tracker -f
 
 ## 🔄 GitHub-Controlled Auto-Deployment
 
-The GCP VM includes an automated systemd timer (`tidbyt-updater.timer`) that polls GitHub every 3 minutes.
+The GCP VM includes an automated systemd timer (`tidbyt-updater.timer`) running as `root` that polls GitHub every 3 minutes.
 - **Push any changes** (tweaking fonts, colors, layouts, or tracker settings) to `main`.
 - Within 3 minutes, the VM automatically pulls the latest commit, reinstalls dependencies if `requirements.txt` changed, and restarts the tracker daemon!
 - Requires **zero open firewall ports** or complex webhooks.
@@ -127,6 +130,8 @@ The GCP VM includes an automated systemd timer (`tidbyt-updater.timer`) that pol
 | `OPENSKY_POLL_INTERVAL`| `22` | Seconds between OpenSky calls (keeps under 4,000 credit/day limit) |
 | `REF_LAT` | `47.6186` | Latitude of Denny & Westlake, Seattle |
 | `REF_LON` | `-122.3365` | Longitude of Denny & Westlake, Seattle |
-| `MAX_RADIUS_MILES` | `15.0` | Maximum radius for tracking overhead aircraft |
+| `MAX_RADIUS_MILES` | `25.0` | Maximum radius in miles for tracking overhead aircraft |
+| `TIMEZONE` | `America/Los_Angeles` | Timezone string for analog clock display |
 | `POLL_INTERVAL_SECONDS`| `10` | Frequency of display updates on Tidbyt |
+| `SHOW_SECOND_HAND` | `false` | Set to `true` for second hand on analog clock |
 | `EASTERN_PRIORITY` | `true` | Prioritize aircraft in $0^\circ \le \theta \le 180^\circ$ (N $\to$ E $\to$ S) |
