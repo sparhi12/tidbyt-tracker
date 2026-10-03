@@ -94,11 +94,11 @@ class FlightService:
         if not best:
             # Standby mode when no flights are overhead
             return {
-                "flight_no": "SEATTLE",
-                "airline": "Clear Sky",
-                "row3_text": "NW -> 0.0m",
-                "route_codes": "SEA AREA",
-                "route_cities": "Denny & Westlake",
+                "flight_no": "SCANNING",
+                "airline": "Seattle Skies",
+                "row3_text": format_row3("Nw", 0.0),
+                "route_codes": "SEA>---",
+                "route_cities": "Overhead Seattle",
                 "is_active": "false"
             }
 
