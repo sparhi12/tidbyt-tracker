@@ -11,8 +11,8 @@ The screen is split into two 32x32 pixel halves:
 ```
 +--------------------------------+--------------------------------+
 | ASA1762                        |             __--__             |
-| SEA>SFO                        |            /  12  \            |
-| Nw<^0.1m                       |           | 9  •   3|          |
+| Nw 0.1                         |            /  12  \            |
+| SEA>SFO                        |           | 9  •   3|          |
 | Alaska                         |            \   6  /            |
 | Seattle > San Francisco        |             ^--__^             |
 +--------------------------------+--------------------------------+
@@ -22,8 +22,8 @@ The screen is split into two 32x32 pixel halves:
 
 ### Left Half (5 Rows):
 1. **Row 1 (Static)**: Flight Number (e.g. `ASA1762`) in gold (`#FFD700`), centered.
-2. **Row 2 (Static)**: Origin > Destination IATA codes (e.g. `SEA>SFO`) in amber (`#FB923C`), left-aligned with 1px padding.
-3. **Row 3 (Static)**: 8-point compass direction, directional arrow pointing to plane (`^`, `^>`, `>`, `v>`, `v`, `<v`, `<`, `<^`), and distance (e.g. **`Nw<^0.1m`**, with lowercase `w` for West) in green (`#4ADE80`). Compact format without spaces to prevent clipping.
+2. **Row 2 (Static)**: 8-point compass direction & distance in miles (e.g. **`Nw 0.1`**, with lowercase `w` for West) in green (`#4ADE80`), left-aligned with 1px padding.
+3. **Row 3 (Static)**: Origin > Destination IATA codes (e.g. `SEA>SFO`) in amber (`#FB923C`), left-aligned with 1px padding.
 4. **Row 4 (Scrolling Marquee)**: Airline brand name (e.g. `Alaska`) with smooth Marquee scroll in sky blue (`#38BDF8`).
 5. **Row 5 (Scrolling Marquee)**: Origin > Destination full city names (e.g. `Seattle > San Francisco`) with Marquee scroll in soft white (`#E2E8F0`).
 
@@ -33,8 +33,8 @@ The screen is split into two 32x32 pixel halves:
 ### Standby Mode:
 When no aircraft are in the overhead airspace, the Tidbyt displays:
 - Row 1: `SCANNING`
-- Row 2: `SEA>---`
-- Row 3: `Nw<^0.0m`
+- Row 2: `Nw 0.0`
+- Row 3: `SEA>---`
 - Row 4: `Seattle Skies`
 - Row 5: `Overhead Seattle`
 - Right Half: Analog clock continues showing live real-time local hours, minutes, and seconds.

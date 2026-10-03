@@ -33,8 +33,8 @@ class Config:
     REF_LON = float(os.getenv("REF_LON", "-122.3365"))
     MAX_RADIUS_MILES = float(os.getenv("MAX_RADIUS_MILES", "25.0"))
 
-    # Display update interval
-    POLL_INTERVAL_SECONDS = int(os.getenv("POLL_INTERVAL_SECONDS", "10"))
+    # Display update interval (seconds) - 3s for high precision
+    POLL_INTERVAL_SECONDS = int(os.getenv("POLL_INTERVAL_SECONDS", "3"))
 
     # Clock settings: show or hide jumping second hand and timezone
     SHOW_SECOND_HAND = os.getenv("SHOW_SECOND_HAND", "false").lower() in ("true", "1", "yes")

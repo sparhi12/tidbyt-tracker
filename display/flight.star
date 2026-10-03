@@ -3,8 +3,8 @@ Tidbyt Flight Tracker Display
 Resolution: 64x32
 Left Half (32x32): 5 rows of flight information (Left-anchored, no clipping)
   Row 1 (Static): Flight Number (Gold)
-  Row 2 (Static): Route Codes (Amber)
-  Row 3 (Static): Direction + Arrow + Distance (Green)
+  Row 2 (Static): Direction & Distance (Green)
+  Row 3 (Static): Route Codes (Amber)
   Row 4 (Scrolling): Airline Name (Sky Blue)
   Row 5 (Scrolling): Route Cities (Soft White)
 Right Half (32x32): Real-time analog clock
@@ -16,7 +16,7 @@ load("render.star", "render")
 def main(config):
     flight_no = config.get("flight_no", "SCANNING").strip()
     airline = config.get("airline", "Seattle Skies").strip()
-    row3_text = config.get("row3_text", "Nw<^0.1m").strip()
+    row3_text = config.get("row3_text", "Nw 0.1").strip()
     route_codes = config.get("route_codes", "SEA>---").strip()
     route_cities = config.get("route_cities", "Seattle > Clear Sky").strip()
     clock_b64 = config.get("clock_b64", "")
@@ -38,20 +38,7 @@ def main(config):
                     color = "#FFD700",
                 ),
             ),
-            # Row 2: Route Codes (Static, Amber, e.g. "SEA>SFO", flush left with 1px padding)
-            render.Row(
-                children = [
-                    render.Padding(
-                        pad = (1, 0, 0, 0),
-                        child = render.Text(
-                            content = route_codes,
-                            font = "tom-thumb",
-                            color = "#FB923C",
-                        ),
-                    ),
-                ],
-            ),
-            # Row 3: Direction + Arrow + Distance (Static, Green, e.g. "Nw<^0.1m")
+            # Row 2: Direction & Distance (Static, Green, e.g. "Nw 0.1", flush left with 1px padding)
             render.Row(
                 children = [
                     render.Padding(
@@ -60,6 +47,19 @@ def main(config):
                             content = row3_text,
                             font = "tom-thumb",
                             color = "#4ADE80",
+                        ),
+                    ),
+                ],
+            ),
+            # Row 3: Route Codes (Static, Amber, e.g. "SEA>SFO", flush left with 1px padding)
+            render.Row(
+                children = [
+                    render.Padding(
+                        pad = (1, 0, 0, 0),
+                        child = render.Text(
+                            content = route_codes,
+                            font = "tom-thumb",
+                            color = "#FB923C",
                         ),
                     ),
                 ],

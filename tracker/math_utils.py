@@ -74,14 +74,11 @@ def is_eastern_hemisphere(bearing: float) -> bool:
     norm = (bearing + 360.0) % 360.0
     return 0.0 <= norm <= 180.0
 
-def format_row3(direction: str, distance_miles: float, arrow: Optional[str] = None) -> str:
+def format_row3(direction: str, distance_miles: float) -> str:
     """
-    Format Row 3 text compactly without trailing 'm' or multi-character arrow arms.
-    Format: 'Nw^0.1', 'w<0.1', 'N^12'
+    Format direction and distance with clean spacing, no arrow, no 'm' suffix.
+    Format: 'Nw 0.1', 'w 0.1', 'N 12'
     """
-    if not arrow:
-        arrow = COMPASS_ARROWS.get(direction, ">")
-
     if distance_miles < 0.05:
         dist_str = "0.0"
     elif distance_miles < 10.0:
@@ -89,7 +86,7 @@ def format_row3(direction: str, distance_miles: float, arrow: Optional[str] = No
     else:
         dist_str = f"{int(round(distance_miles))}"
 
-    return f"{direction}{arrow}{dist_str}"
+    return f"{direction} {dist_str}"
 
 def select_best_flight(
     aircraft_list: List[Dict],
