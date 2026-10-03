@@ -6,6 +6,7 @@ and Tidbyt API push on a precise 10-second loop.
 
 import argparse
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import logging
 import signal
 import sys
@@ -48,7 +49,11 @@ class FlightTrackerDaemon:
         Execute a single tracking, rendering, and push cycle.
         """
         start_time = time.time()
-        now_dt = datetime.now()
+        try:
+            tz = ZoneInfo(self.config.TIMEZONE)
+            now_dt = datetime.now(tz)
+        except Exception:
+            now_dt = datetime.now()
 
         # 1. Generate 32x32 analog clock PNG
         clock_b64 = generate_analog_clock(now_dt, show_second_hand=self.config.SHOW_SECOND_HAND)

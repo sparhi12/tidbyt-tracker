@@ -52,7 +52,7 @@ class TestMathUtils(unittest.TestCase):
         # West: Bainbridge Island (47.6186, -122.5000)
         bearing_w = calculate_bearing(self.ref_lat, self.ref_lon, 47.6186, -122.5000)
         self.assertAlmostEqual(bearing_w, 270.0, delta=2.0)
-        self.assertEqual(bearing_to_compass(bearing_w), "W")
+        self.assertEqual(bearing_to_compass(bearing_w), "w")
 
     def test_eastern_hemisphere(self):
         # 0° to 180° is eastern hemisphere (North -> East -> South)
@@ -68,19 +68,19 @@ class TestMathUtils(unittest.TestCase):
         self.assertFalse(is_eastern_hemisphere(315.0))
 
     def test_format_row3_no_miles(self):
-        # User explicitly requested "NW -> 0.1m" without "iles"
-        res_01 = format_row3("NW", 0.12)
-        self.assertEqual(res_01, "NW -> 0.1m")
+        # Direction, directional arrow pointing to plane, and distance without extra space
+        res_01 = format_row3("Nw", 0.12)
+        self.assertEqual(res_01, "Nw<^0.1m")
         self.assertNotIn("iles", res_01)
 
         res_zero = format_row3("N", 0.02)
-        self.assertEqual(res_zero, "N -> 0.0m")
+        self.assertEqual(res_zero, "N^0.0m")
 
         res_14 = format_row3("E", 1.44)
-        self.assertEqual(res_14, "E -> 1.4m")
+        self.assertEqual(res_14, "E>1.4m")
 
         res_12 = format_row3("SE", 12.3)
-        self.assertEqual(res_12, "SE -> 12m")
+        self.assertEqual(res_12, "SEv>12m")
 
     def test_eastern_priority_selection(self):
         # Airplane 1: West (Bainbridge Island, 270°), 4 miles away

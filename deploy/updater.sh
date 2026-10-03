@@ -13,7 +13,10 @@ if [ ! -d ".git" ]; then
     exit 0
 fi
 
-# Fetch remote changes silently
+# Allow git operations regardless of user ownership (prevents dubious ownership errors)
+git config --global --add safe.directory "$APP_DIR" 2>/dev/null || true
+
+# Fetch remote changes
 git fetch origin main --quiet 2>/dev/null || exit 0
 
 LOCAL=$(git rev-parse HEAD)
@@ -29,8 +32,8 @@ if [ "$LOCAL" != "$REMOTE" ]; then
         "$APP_DIR/venv/bin/pip" install -q -r requirements.txt
     fi
 
-    # Restart daemon service
+    # Restart daemon service directly
     echo "[$(date -u '+%Y-%m-%d %H:%M:%S UTC')] Restarting tidbyt-tracker service..."
-    sudo systemctl restart tidbyt-tracker.service || true
+    systemctl restart tidbyt-tracker.service
     echo "[$(date -u '+%Y-%m-%d %H:%M:%S UTC')] Update successfully applied."
 fi

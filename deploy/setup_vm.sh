@@ -66,6 +66,7 @@ fi
 
 # 5. Install Systemd Services & Timer
 echo "[5/5] Configuring systemd services and auto-updater timer..."
+git config --global --add safe.directory "$APP_DIR" 2>/dev/null || true
 sudo cp deploy/tidbyt-tracker.service /etc/systemd/system/
 sudo cp deploy/tidbyt-updater.service /etc/systemd/system/
 sudo cp deploy/tidbyt-updater.timer /etc/systemd/system/
@@ -75,7 +76,6 @@ CURRENT_USER="${SUDO_USER:-$(whoami)}"
 sudo sed -i "s|__APP_DIR__|$APP_DIR|g" /etc/systemd/system/tidbyt-tracker.service
 sudo sed -i "s|__USER__|$CURRENT_USER|g" /etc/systemd/system/tidbyt-tracker.service
 sudo sed -i "s|__APP_DIR__|$APP_DIR|g" /etc/systemd/system/tidbyt-updater.service
-sudo sed -i "s|__USER__|$CURRENT_USER|g" /etc/systemd/system/tidbyt-updater.service
 
 sudo systemctl daemon-reload
 sudo systemctl enable tidbyt-tracker.service

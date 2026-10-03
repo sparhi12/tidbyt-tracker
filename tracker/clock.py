@@ -58,8 +58,8 @@ def generate_analog_clock(dt: Optional[datetime] = None, show_second_hand: bool 
 
         if h % 3 == 0:
             # Main cardinal marks: 2.5px long, bright white
-            r1 = inner_radius - 2.8
-            r2 = inner_radius - 0.5
+            r1 = inner_radius - 3.0
+            r2 = inner_radius - 1.0
             x1 = center_x + r1 * math.cos(angle_rad)
             y1 = center_y + r1 * math.sin(angle_rad)
             x2 = center_x + r2 * math.cos(angle_rad)

@@ -136,7 +136,7 @@ class RouteResolver:
                     dest_city = dest.get("municipality") or dest.get("name", "")
 
                     if orig_code and dest_code:
-                        return (f"{orig_code} > {dest_code}", f"{orig_city} > {dest_city}")
+                        return (f"{orig_code}>{dest_code}", f"{orig_city} > {dest_city}")
         except Exception as e:
             logger.debug(f"adsbdb lookup failed for {callsign}: {e}")
         return None
@@ -152,7 +152,7 @@ class RouteResolver:
                     parts = raw_route.split("-")
                     orig_code, orig_city = resolve_airport(parts[0].strip())
                     dest_code, dest_city = resolve_airport(parts[1].strip())
-                    return (f"{orig_code} > {dest_code}", f"{orig_city} > {dest_city}")
+                    return (f"{orig_code}>{dest_code}", f"{orig_city} > {dest_city}")
         except Exception as e:
             logger.debug(f"hexdb lookup failed for {callsign}: {e}")
         return None

@@ -18,10 +18,21 @@ COMPASS_8_SECTORS = [
     ("E", 67.5, 112.5),
     ("SE", 112.5, 157.5),
     ("S", 157.5, 202.5),
-    ("SW", 202.5, 247.5),
-    ("W", 247.5, 292.5),
-    ("NW", 292.5, 337.5),
+    ("Sw", 202.5, 247.5),
+    ("w", 247.5, 292.5),
+    ("Nw", 292.5, 337.5),
 ]
+
+COMPASS_ARROWS = {
+    "N": "^",
+    "NE": "^>",
+    "E": ">",
+    "SE": "v>",
+    "S": "v",
+    "Sw": "<v",
+    "w": "<",
+    "Nw": "<^",
+}
 
 EARTH_RADIUS_MILES = 3958.7613
 
@@ -63,16 +74,22 @@ def is_eastern_hemisphere(bearing: float) -> bool:
     norm = (bearing + 360.0) % 360.0
     return 0.0 <= norm <= 180.0
 
-def format_row3(direction: str, distance_miles: float) -> str:
+def format_row3(direction: str, distance_miles: float, arrow: Optional[str] = None) -> str:
     """
-    Format Row 3 text without 'iles' and optimized for 32px display without scrolling.
-    Format: 'NW -> 0.1m' or 'NW -> 12m'
+    Format Row 3 text without extra spaces to prevent right-edge clipping.
+    Format: 'Nw<^0.1m' or 'w<0.1m' or 'N^12m'
     """
+    if not arrow:
+        arrow = COMPASS_ARROWS.get(direction, ">")
+
     if distance_miles < 0.05:
-        return f"{direction} -> 0.0m"
-    if distance_miles < 10.0:
-        return f"{direction} -> {distance_miles:.1f}m"
-    return f"{direction} -> {int(round(distance_miles))}m"
+        dist_str = "0.0m"
+    elif distance_miles < 10.0:
+        dist_str = f"{distance_miles:.1f}m"
+    else:
+        dist_str = f"{int(round(distance_miles))}m"
+
+    return f"{direction}{arrow}{dist_str}"
 
 def select_best_flight(
     aircraft_list: List[Dict],

@@ -4,7 +4,7 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-User=__USER__
+User=root
 WorkingDirectory=__APP_DIR__
 ExecStart=__APP_DIR__/deploy/updater.sh
 StandardOutput=journal
