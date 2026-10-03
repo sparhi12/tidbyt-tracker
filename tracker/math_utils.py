@@ -25,13 +25,13 @@ COMPASS_8_SECTORS = [
 
 COMPASS_ARROWS = {
     "N": "^",
-    "NE": "^>",
+    "NE": "^",
     "E": ">",
-    "SE": "v>",
+    "SE": "v",
     "S": "v",
-    "Sw": "<v",
+    "Sw": "<",
     "w": "<",
-    "Nw": "<^",
+    "Nw": "^",
 }
 
 EARTH_RADIUS_MILES = 3958.7613
@@ -76,18 +76,18 @@ def is_eastern_hemisphere(bearing: float) -> bool:
 
 def format_row3(direction: str, distance_miles: float, arrow: Optional[str] = None) -> str:
     """
-    Format Row 3 text without extra spaces to prevent right-edge clipping.
-    Format: 'Nw<^0.1m' or 'w<0.1m' or 'N^12m'
+    Format Row 3 text compactly without trailing 'm' or multi-character arrow arms.
+    Format: 'Nw^0.1', 'w<0.1', 'N^12'
     """
     if not arrow:
         arrow = COMPASS_ARROWS.get(direction, ">")
 
     if distance_miles < 0.05:
-        dist_str = "0.0m"
+        dist_str = "0.0"
     elif distance_miles < 10.0:
-        dist_str = f"{distance_miles:.1f}m"
+        dist_str = f"{distance_miles:.1f}"
     else:
-        dist_str = f"{int(round(distance_miles))}m"
+        dist_str = f"{int(round(distance_miles))}"
 
     return f"{direction}{arrow}{dist_str}"
 

@@ -68,19 +68,19 @@ class TestMathUtils(unittest.TestCase):
         self.assertFalse(is_eastern_hemisphere(315.0))
 
     def test_format_row3_no_miles(self):
-        # Direction, directional arrow pointing to plane, and distance without extra space
+        # Single directional arrow and distance without 'm' suffix
         res_01 = format_row3("Nw", 0.12)
-        self.assertEqual(res_01, "Nw<^0.1m")
-        self.assertNotIn("iles", res_01)
+        self.assertEqual(res_01, "Nw^0.1")
+        self.assertNotIn("m", res_01)
 
         res_zero = format_row3("N", 0.02)
-        self.assertEqual(res_zero, "N^0.0m")
+        self.assertEqual(res_zero, "N^0.0")
 
         res_14 = format_row3("E", 1.44)
-        self.assertEqual(res_14, "E>1.4m")
+        self.assertEqual(res_14, "E>1.4")
 
         res_12 = format_row3("SE", 12.3)
-        self.assertEqual(res_12, "SEv>12m")
+        self.assertEqual(res_12, "SEv12")
 
     def test_eastern_priority_selection(self):
         # Airplane 1: West (Bainbridge Island, 270°), 4 miles away
