@@ -39,24 +39,16 @@ def main(config):
                 ),
             ),
             # Row 2: Direction & Distance (Static, Green, e.g. "Nw 0.12", flush left)
-            render.Box(
-                width = 32,
-                height = 6,
-                child = render.Text(
-                    content = row3_text,
-                    font = "tom-thumb",
-                    color = "#4ADE80",
-                ),
+            render.Text(
+                content = row3_text,
+                font = "tom-thumb",
+                color = "#4ADE80",
             ),
             # Row 3: Route Codes (Static, Amber, e.g. "SEA>SFO", flush left)
-            render.Box(
-                width = 32,
-                height = 6,
-                child = render.Text(
-                    content = route_codes,
-                    font = "tom-thumb",
-                    color = "#FB923C",
-                ),
+            render.Text(
+                content = route_codes,
+                font = "tom-thumb",
+                color = "#FB923C",
             ),
             # Row 4: Airline Name (Marquee fast scroll, Sky Blue)
             render.Box(

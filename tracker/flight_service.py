@@ -12,7 +12,14 @@ from typing import Dict, List, Optional, Tuple
 from tracker.airlines import resolve_airline
 from tracker.airplanes_live import AirplanesLiveClient
 from tracker.config import Config
-from tracker.math_utils import format_row3, project_position, select_best_flight
+from tracker.math_utils import (
+    bearing_to_compass,
+    calculate_bearing,
+    format_row3,
+    haversine_distance_miles,
+    project_position,
+    select_best_flight,
+)
 from tracker.opensky import OpenSkyClient
 from tracker.routes import RouteResolver
 
