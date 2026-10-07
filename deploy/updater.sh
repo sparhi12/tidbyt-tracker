@@ -26,6 +26,13 @@ if [ "$LOCAL" != "$REMOTE" ]; then
     echo "[$(date -u '+%Y-%m-%d %H:%M:%S UTC')] New commit detected on origin/main. Updating ($LOCAL -> $REMOTE)..."
     git pull origin main --quiet
 
+    # Ensure .env has latest defaults (second hand enabled, 1s polling)
+    if [ -f ".env" ]; then
+        sed -i 's/SHOW_SECOND_HAND=false/SHOW_SECOND_HAND=true/g' .env 2>/dev/null || true
+        sed -i 's/POLL_INTERVAL_SECONDS=10/POLL_INTERVAL_SECONDS=1/g' .env 2>/dev/null || true
+        sed -i 's/POLL_INTERVAL_SECONDS=3/POLL_INTERVAL_SECONDS=1/g' .env 2>/dev/null || true
+    fi
+
     # Reinstall Python requirements if requirements.txt changed
     if git diff --name-only "$LOCAL" "$REMOTE" | grep -q "requirements.txt"; then
         echo "[$(date -u '+%Y-%m-%d %H:%M:%S UTC')] requirements.txt updated. Reinstalling..."

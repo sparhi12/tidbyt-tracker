@@ -106,10 +106,32 @@ class FlightService:
         airline_name = resolve_airline(callsign)
         route_codes, route_cities = self.route_resolver.get_route(callsign)
 
+        # Apply 1-second real-time position projection
+        lat = best.get("lat")
+        lon = best.get("lon")
+        velocity = best.get("velocity")
+        track = best.get("track")
+        updated_at = best.get("updated_at", now)
+
+        dt = max(0.0, now - updated_at)
+        if velocity and track and dt > 0:
+            proj_lat, proj_lon = project_position(lat, lon, velocity, track, dt)
+        else:
+            proj_lat, proj_lon = lat, lon
+
+        dist_miles = haversine_distance_miles(
+            self.config.REF_LAT, self.config.REF_LON, proj_lat, proj_lon
+        )
+        bearing = calculate_bearing(
+            self.config.REF_LAT, self.config.REF_LON, proj_lat, proj_lon
+        )
+        direction = bearing_to_compass(bearing)
+        row3_text = format_row3(direction, dist_miles)
+
         return {
             "flight_no": callsign if callsign else "OVERHEAD",
             "airline": airline_name,
-            "row3_text": best.get("row3_text", format_row3(best.get("direction", "N"), best.get("dist_miles", 0.0))),
+            "row3_text": row3_text,
             "route_codes": route_codes,
             "route_cities": route_cities,
             "is_active": "true"
