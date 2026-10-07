@@ -33,11 +33,11 @@ class Config:
     REF_LON = float(os.getenv("REF_LON", "-122.3365"))
     MAX_RADIUS_MILES = float(os.getenv("MAX_RADIUS_MILES", "25.0"))
 
-    # Display update interval (seconds) - 3s for high precision
-    POLL_INTERVAL_SECONDS = int(os.getenv("POLL_INTERVAL_SECONDS", "3"))
+    # Display update interval (seconds) - 1s high frequency
+    POLL_INTERVAL_SECONDS = int(os.getenv("POLL_INTERVAL_SECONDS", "1"))
 
     # Clock settings: show or hide jumping second hand and timezone
-    SHOW_SECOND_HAND = os.getenv("SHOW_SECOND_HAND", "false").lower() in ("true", "1", "yes")
+    SHOW_SECOND_HAND = os.getenv("SHOW_SECOND_HAND", "true").lower() in ("true", "1", "yes")
     TIMEZONE = os.getenv("TIMEZONE", "America/Los_Angeles")
 
     # Flight selection priority: Eastern hemisphere (0° to 180° / N -> E -> S)

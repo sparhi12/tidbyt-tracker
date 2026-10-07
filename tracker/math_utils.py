@@ -76,12 +76,14 @@ def is_eastern_hemisphere(bearing: float) -> bool:
 
 def format_row3(direction: str, distance_miles: float) -> str:
     """
-    Format direction and distance with clean spacing, no arrow, no 'm' suffix.
-    Format: 'Nw 0.1', 'w 0.1', 'N 12'
+    Format direction and distance with 2 decimal places for high-precision 1s tracking.
+    Format: 'Nw 0.12', 'w 0.05', 'N 12.3'
     """
-    if distance_miles < 0.05:
-        dist_str = "0.0"
+    if distance_miles < 0.005:
+        dist_str = "0.00"
     elif distance_miles < 10.0:
+        dist_str = f"{distance_miles:.2f}"
+    elif distance_miles < 100.0:
         dist_str = f"{distance_miles:.1f}"
     else:
         dist_str = f"{int(round(distance_miles))}"

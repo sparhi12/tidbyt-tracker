@@ -11,7 +11,7 @@ The screen is split into two 32x32 pixel halves:
 ```
 +--------------------------------+--------------------------------+
 | ASA1762                        |             __--__             |
-| Nw 0.1                         |            /  12  \            |
+| Nw 0.12                        |            /  12  \            |
 | SEA>SFO                        |           | 9  •   3|          |
 | Alaska                         |            \   6  /            |
 | Seattle > San Francisco        |             ^--__^             |
@@ -22,18 +22,18 @@ The screen is split into two 32x32 pixel halves:
 
 ### Left Half (5 Rows):
 1. **Row 1 (Static)**: Flight Number (e.g. `ASA1762`) in gold (`#FFD700`), centered.
-2. **Row 2 (Static)**: 8-point compass direction & distance in miles (e.g. **`Nw 0.1`**, with lowercase `w` for West) in green (`#4ADE80`), left-aligned with 1px padding.
-3. **Row 3 (Static)**: Origin > Destination IATA codes (e.g. `SEA>SFO`) in amber (`#FB923C`), left-aligned with 1px padding.
+2. **Row 2 (Static)**: 8-point compass direction & distance with 2 decimal places in miles (e.g. **`Nw 0.12`**, with lowercase `w` for West) in green (`#4ADE80`), anchored flush left.
+3. **Row 3 (Static)**: Origin > Destination IATA codes (e.g. `SEA>SFO`) in amber (`#FB923C`), anchored flush left.
 4. **Row 4 (Scrolling Marquee)**: Airline brand name (e.g. `Alaska`) with smooth Marquee scroll in sky blue (`#38BDF8`).
 5. **Row 5 (Scrolling Marquee)**: Origin > Destination full city names (e.g. `Seattle > San Francisco`) with Marquee scroll in soft white (`#E2E8F0`).
 
 ### Right Half:
-- **Real-Time 32x32 Analog Clock**: Generated dynamically with pixel-perfect Euclidean circle dial, radial cardinal hour ticks (12, 3, 6, 9), 1-pixel red hour hand, 1-pixel sky blue minute hand, and optional red second hand. Configured to display local timezone time (`TIMEZONE=America/Los_Angeles`).
+- **Real-Time 32x32 Analog Clock**: Generated dynamically with pixel-perfect Euclidean circle dial, radial cardinal hour ticks (12, 3, 6, 9), 1-pixel red hour hand, 1-pixel sky blue minute hand, and 1-pixel red ticking second hand updating every 1s (`SHOW_SECOND_HAND=true`, `TIMEZONE=America/Los_Angeles`).
 
 ### Standby Mode:
 When no aircraft are in the overhead airspace, the Tidbyt displays:
 - Row 1: `SCANNING`
-- Row 2: `Nw 0.0`
+- Row 2: `Nw 0.00`
 - Row 3: `SEA>---`
 - Row 4: `Seattle Skies`
 - Row 5: `Overhead Seattle`

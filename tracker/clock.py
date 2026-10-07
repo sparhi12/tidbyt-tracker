@@ -87,16 +87,16 @@ def generate_analog_clock(dt: Optional[datetime] = None, show_second_hand: bool 
     my = center_y + 10.0 * math.sin(min_rad)
     draw.line([(round(center_x), round(center_y)), (round(mx), round(my))], fill=(56, 189, 248, 255), width=1)
 
-    # 5. Optional Second Hand
+    # 5. Optional Second Hand: light green (74, 222, 128), length 12.0px (longer than minute hand), width 1px
     if show_second_hand:
         sec_val = dt.second
         sec_rad = math.radians(sec_val * 6.0 - 90.0)
-        sx = center_x + 11.0 * math.cos(sec_rad)
-        sy = center_y + 11.0 * math.sin(sec_rad)
+        sx = center_x + 12.0 * math.cos(sec_rad)
+        sy = center_y + 12.0 * math.sin(sec_rad)
         tx = center_x - 2.0 * math.cos(sec_rad)
         ty = center_y - 2.0 * math.sin(sec_rad)
-        draw.line([(round(tx), round(ty)), (round(sx), round(sy))], fill=(239, 68, 68, 255), width=1)
-        center_color = (239, 68, 68, 255)
+        draw.line([(round(tx), round(ty)), (round(sx), round(sy))], fill=(74, 222, 128, 255), width=1)
+        center_color = (74, 222, 128, 255)
     else:
         center_color = (255, 255, 255, 255)
 
