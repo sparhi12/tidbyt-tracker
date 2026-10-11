@@ -15,6 +15,7 @@ import time
 from tracker.clock import generate_analog_clock
 from tracker.config import Config
 from tracker.flight_service import FlightService
+from tracker.palette import get_palette_for_time
 from tracker.tidbyt import TidbytClient
 
 logging.basicConfig(
@@ -60,6 +61,17 @@ class FlightTrackerDaemon:
 
         # 2. Get latest flight data
         flight_data = self.flight_service.get_current_display_data()
+        # Pass poll interval to Starlark template so marquee scroll speed adapts
+        flight_data["poll_interval_ms"] = str(int(self.config.POLL_INTERVAL_SECONDS * 1000))
+
+        # Apply curated color palette based on 8-hour day/sunset/night schedule
+        palette = get_palette_for_time(now_dt, mode=self.config.PALETTE_MODE)
+        flight_data["color_row1"] = palette["row1"]
+        flight_data["color_row2"] = palette["row2"]
+        flight_data["color_row3"] = palette["row3"]
+        flight_data["color_row4"] = palette["row4"]
+        flight_data["color_row5"] = palette["row5"]
+
         logger.info(
             f"Active Flight: {flight_data['flight_no']} | Airline: {flight_data['airline']} | "
             f"Row 3: {flight_data['row3_text']} | Route: {flight_data['route_codes']} ({flight_data['route_cities']})"
@@ -120,13 +132,20 @@ def main():
     if args.test:
         logger.info("Running self-test with simulated flight...")
         clock_b64 = generate_analog_clock(show_second_hand=daemon.config.SHOW_SECOND_HAND)
+        palette = get_palette_for_time(mode=daemon.config.PALETTE_MODE)
         test_data = {
             "flight_no": "AS1762",
             "airline": "Alaska",
-            "row3_text": "NW -> 0.1m",
-            "route_codes": "PDX > LAX",
+            "row3_text": "Nw 0.12",
+            "route_codes": "PDX>LAX",
             "route_cities": "Portland > Los Angeles",
-            "is_active": "true"
+            "is_active": "true",
+            "poll_interval_ms": str(int(daemon.config.POLL_INTERVAL_SECONDS * 1000)),
+            "color_row1": palette["row1"],
+            "color_row2": palette["row2"],
+            "color_row3": palette["row3"],
+            "color_row4": palette["row4"],
+            "color_row5": palette["row5"],
         }
         daemon.tidbyt.render(
             star_path=daemon.config.STAR_PATH,

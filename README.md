@@ -20,15 +20,22 @@ The screen is split into two 32x32 pixel halves:
        Flight Information                    Analog Clock
 ```
 
-### Left Half (5 Rows):
-1. **Row 1 (Static)**: Flight Number (e.g. `ASA1762`) in gold (`#FFD700`), centered.
-2. **Row 2 (Static)**: 8-point compass direction & distance with 2 decimal places in miles (e.g. **`Nw 0.12`**, with lowercase `w` for West) in green (`#4ADE80`), anchored flush left.
-3. **Row 3 (Static)**: Origin > Destination IATA codes (e.g. `SEA>SFO`) in amber (`#FB923C`), anchored flush left.
-4. **Row 4 (Scrolling Marquee)**: Airline brand name (e.g. `Alaska`) with smooth Marquee scroll in sky blue (`#38BDF8`).
-5. **Row 5 (Scrolling Marquee)**: Origin > Destination full city names (e.g. `Seattle > San Francisco`) with Marquee scroll in soft white (`#E2E8F0`).
+### Left Half (5 Rows - Flush Left):
+1. **Row 1 (Static)**: Flight Number (e.g. `ASA1762`), anchored flush left with no gap.
+2. **Row 2 (Static)**: 8-point compass direction & distance with 2 decimal places in miles (e.g. **`Nw 0.12`**, with lowercase `w` for West), anchored flush left.
+3. **Row 3 (Static)**: Origin > Destination IATA codes (e.g. `SEA>SFO`), anchored flush left.
+4. **Row 4 (Scrolling Marquee)**: Airline brand name (e.g. `Alaska`) with adaptive Marquee scroll speed scaled to the polling interval.
+5. **Row 5 (Scrolling Marquee)**: Origin > Destination full city names (e.g. `Seattle > San Francisco`) with adaptive Marquee scroll speed scaled to the polling interval.
+
+### 🎨 Cohesive Color Palettes (8-Hour Time-of-Day Rotation):
+To avoid jarring color clashes on the 64x32 LED matrix, a curated palette rotates every 8 hours based on local time (`America/Los_Angeles`):
+- **Pacific Aviation (Day: 08:00 - 15:59)**: Crisp daytime sky blues, aquas, teals, and soft cloud mist (`#38BDF8`, `#2DD4BF`, `#22D3EE`, `#7DD3FC`, `#E2E8F0`).
+- **Golden Sunset (Evening: 16:00 - 23:59)**: Warm, cozy amber, peach, coral, champagne, and warm cream (`#FBBF24`, `#FDBA74`, `#FB7185`, `#FDE047`, `#FEF3C7`).
+- **Midnight Aurora (Night: 00:00 - 07:59)**: Soothing, low-glare mint jade, emerald, seafoam, lavender, and silver (`#34D399`, `#6EE7B7`, `#A7F3D0`, `#C084FC`, `#CBD5E1`).
+*(Can be locked to a specific theme or overridden via `PALETTE_MODE` in `.env`).*
 
 ### Right Half:
-- **Real-Time 32x32 Analog Clock**: Generated dynamically with pixel-perfect Euclidean circle dial, radial cardinal hour ticks (12, 3, 6, 9), 1-pixel red hour hand, 1-pixel sky blue minute hand, and 1-pixel red ticking second hand updating every 1s (`SHOW_SECOND_HAND=true`, `TIMEZONE=America/Los_Angeles`).
+- **Real-Time 32x32 Analog Clock**: Generated dynamically with pixel-perfect Euclidean circle dial, radial cardinal hour ticks (12, 3, 6, 9), 1-pixel red hour hand, 1-pixel sky blue minute hand, and 1-pixel light green ticking second hand updating live every 1s (`SHOW_SECOND_HAND=true`, `TIMEZONE=America/Los_Angeles`).
 
 ### Standby Mode:
 When no aircraft are in the overhead airspace, the Tidbyt displays:
@@ -132,6 +139,7 @@ The GCP VM includes an automated systemd timer (`tidbyt-updater.timer`) running 
 | `REF_LON` | `-122.3365` | Longitude of Denny & Westlake, Seattle |
 | `MAX_RADIUS_MILES` | `25.0` | Maximum radius in miles for tracking overhead aircraft |
 | `TIMEZONE` | `America/Los_Angeles` | Timezone string for analog clock display |
-| `POLL_INTERVAL_SECONDS`| `10` | Frequency of display updates on Tidbyt |
-| `SHOW_SECOND_HAND` | `false` | Set to `true` for second hand on analog clock |
+| `POLL_INTERVAL_SECONDS`| `1` | Frequency of display updates on Tidbyt (1s real-time tracking) |
+| `SHOW_SECOND_HAND` | `true` | Set to `true` for light green second hand on analog clock |
 | `EASTERN_PRIORITY` | `true` | Prioritize aircraft in $0^\circ \le \theta \le 180^\circ$ (N $\to$ E $\to$ S) |
+| `PALETTE_MODE` | `auto` | Color palette: `auto` (8-hour rotation: Day, Sunset, Night) or `day`, `sunset`, `night` |

@@ -43,6 +43,9 @@ class Config:
     # Flight selection priority: Eastern hemisphere (0° to 180° / N -> E -> S)
     EASTERN_PRIORITY = os.getenv("EASTERN_PRIORITY", "true").lower() in ("true", "1", "yes")
 
+    # Color palette: 'auto' (8-hour rotation: Day, Sunset, Night), or lock to 'day', 'sunset', 'night'
+    PALETTE_MODE = os.getenv("PALETTE_MODE", "auto").lower()
+
     # Paths
     PIXLET_BIN = os.getenv("PIXLET_BIN", "pixlet")
     BASE_DIR = Path(__file__).parent.parent

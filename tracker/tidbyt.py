@@ -42,6 +42,12 @@ class TidbytClient:
             f"route_codes={fields.get('route_codes', 'SEA > ---')}",
             f"route_cities={fields.get('route_cities', 'Seattle')}",
             f"clock_b64={clock_b64}",
+            f"poll_interval_ms={fields.get('poll_interval_ms', '1000')}",
+            f"color_row1={fields.get('color_row1', '#38BDF8')}",
+            f"color_row2={fields.get('color_row2', '#2DD4BF')}",
+            f"color_row3={fields.get('color_row3', '#22D3EE')}",
+            f"color_row4={fields.get('color_row4', '#7DD3FC')}",
+            f"color_row5={fields.get('color_row5', '#E2E8F0')}",
             "-o",
             output_path,
         ]
