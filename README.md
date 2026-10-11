@@ -12,7 +12,7 @@ The screen is split into two 32x32 pixel halves:
 +--------------------------------+--------------------------------+
 | ASA1762                        |             __--__             |
 | Nw 0.12                        |            /  12  \            |
-| SEA>SFO                        |           | 9  •   3|          |
+| SEA > SFO                      |           | 9  •   3|          |
 | Alaska                         |            \   6  /            |
 | Seattle > San Francisco        |             ^--__^             |
 +--------------------------------+--------------------------------+
@@ -23,9 +23,9 @@ The screen is split into two 32x32 pixel halves:
 ### Left Half (5 Rows - Flush Left):
 1. **Row 1 (Static)**: Flight Number (e.g. `ASA1762`), anchored flush left with no gap.
 2. **Row 2 (Static)**: 8-point compass direction & distance with 2 decimal places in miles (e.g. **`Nw 0.12`**, with lowercase `w` for West), anchored flush left.
-3. **Row 3 (Static)**: Origin > Destination IATA codes (e.g. `SEA>SFO`), anchored flush left.
-4. **Row 4 (Scrolling Marquee)**: Airline brand name (e.g. `Alaska`) with adaptive Marquee scroll speed scaled to the polling interval.
-5. **Row 5 (Scrolling Marquee)**: Origin > Destination full city names (e.g. `Seattle > San Francisco`) with adaptive Marquee scroll speed scaled to the polling interval.
+3. **Row 3 (Static)**: Origin > Destination IATA codes (e.g. **`SEA > SFO`**), spaced nicely to extend across the row right up to the clock edge.
+4. **Row 4 (Scrolling Marquee)**: Airline brand name (e.g. `Alaska`) with scrolling window extended to $x=34$ at the clock bezel edge.
+5. **Row 5 (Scrolling Marquee)**: Origin > Destination full city names (e.g. `Seattle > San Francisco`) with scrolling window extended to $x=38$ into the curve under the clock. Both scrolling rows adaptively compute frame rate from fragment length and poll interval, ensuring long routes (e.g. `San Francisco > Portland`) display completely in 1 run.
 
 ### 🎨 Cohesive Color Palettes (8-Hour Time-of-Day Rotation):
 To avoid jarring color clashes on the 64x32 LED matrix, a curated palette rotates every 8 hours based on local time (`America/Los_Angeles`):
@@ -41,7 +41,7 @@ To avoid jarring color clashes on the 64x32 LED matrix, a curated palette rotate
 When no aircraft are in the overhead airspace, the Tidbyt displays:
 - Row 1: `SCANNING`
 - Row 2: `Nw 0.00`
-- Row 3: `SEA>---`
+- Row 3: `SEA > ---`
 - Row 4: `Seattle Skies`
 - Row 5: `Overhead Seattle`
 - Right Half: Analog clock continues showing live real-time local hours, minutes, and seconds.

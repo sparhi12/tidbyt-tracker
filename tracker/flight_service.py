@@ -104,7 +104,7 @@ class FlightService:
                 "flight_no": "SCANNING",
                 "airline": "Seattle Skies",
                 "row3_text": format_row3("Nw", 0.0),
-                "route_codes": "SEA>---",
+                "route_codes": "SEA > ---",
                 "route_cities": "Overhead Seattle",
                 "is_active": "false"
             }

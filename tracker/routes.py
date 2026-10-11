@@ -50,6 +50,11 @@ class RouteResolver:
         except Exception as e:
             logger.warning(f"Could not initialize route SQLite cache: {e}")
 
+    def _normalize_codes(self, codes: str) -> str:
+        if ">" in codes and " > " not in codes:
+            return codes.replace(">", " > ")
+        return codes
+
     def get_route(self, callsign: Optional[str]) -> Tuple[str, str]:
         """
         Returns (route_codes, route_cities).
@@ -68,7 +73,7 @@ class RouteResolver:
         if cs in self._memory_cache:
             codes, cities, exp = self._memory_cache[cs]
             if now < exp:
-                return (codes, cities)
+                return (self._normalize_codes(codes), cities)
 
         # 2. Check SQLite cache
         try:
@@ -82,8 +87,9 @@ class RouteResolver:
                 if row:
                     codes, cities, ts = row
                     if now - ts < CACHE_TTL_SECONDS:
-                        self._memory_cache[cs] = (codes, cities, now + (CACHE_TTL_SECONDS - (now - ts)))
-                        return (codes, cities)
+                        norm_codes = self._normalize_codes(codes)
+                        self._memory_cache[cs] = (norm_codes, cities, now + (CACHE_TTL_SECONDS - (now - ts)))
+                        return (norm_codes, cities)
         except Exception as e:
             logger.debug(f"SQLite lookup error for {cs}: {e}")
 
@@ -136,7 +142,7 @@ class RouteResolver:
                     dest_city = dest.get("municipality") or dest.get("name", "")
 
                     if orig_code and dest_code:
-                        return (f"{orig_code}>{dest_code}", f"{orig_city} > {dest_city}")
+                        return (f"{orig_code} > {dest_code}", f"{orig_city} > {dest_city}")
         except Exception as e:
             logger.debug(f"adsbdb lookup failed for {callsign}: {e}")
         return None
@@ -152,7 +158,7 @@ class RouteResolver:
                     parts = raw_route.split("-")
                     orig_code, orig_city = resolve_airport(parts[0].strip())
                     dest_code, dest_city = resolve_airport(parts[1].strip())
-                    return (f"{orig_code}>{dest_code}", f"{orig_city} > {dest_city}")
+                    return (f"{orig_code} > {dest_code}", f"{orig_city} > {dest_city}")
         except Exception as e:
             logger.debug(f"hexdb lookup failed for {callsign}: {e}")
         return None
