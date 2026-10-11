@@ -137,7 +137,7 @@ def main():
             "flight_no": "AS1762",
             "airline": "Alaska",
             "row3_text": "Nw 0.12",
-            "route_codes": "PDX > LAX",
+            "route_codes": "PDX->LAX",
             "route_cities": "Portland > Los Angeles",
             "is_active": "true",
             "poll_interval_ms": str(int(daemon.config.POLL_INTERVAL_SECONDS * 1000)),

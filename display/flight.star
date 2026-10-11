@@ -17,13 +17,20 @@ def main(config):
     flight_no = config.get("flight_no", "SCANNING").strip()
     airline = config.get("airline", "Seattle Skies").strip()
     row3_text = config.get("row3_text", "Nw 0.00").strip()
-    route_codes = config.get("route_codes", "SEA > ---").strip()
+    route_codes = config.get("route_codes", "SEA->---").strip()
     route_cities = config.get("route_cities", "Seattle > Clear Sky").strip()
     clock_b64 = config.get("clock_b64", "")
 
-    # Ensure route codes have spaces around '>' (e.g. 'SEA > SFO') to fill space before clock edge
-    if ">" in route_codes and " > " not in route_codes:
-        route_codes = route_codes.replace(">", " > ")
+    # Format route codes cleanly:
+    # tom-thumb is a 4px/char monospace font. Exactly 8 characters (8 * 4px = 32px) fills row 3
+    # up to x=31 without ever penetrating the clock bezel at x=33.
+    # Convert 'SEA > SFO' or 'SEA>SFO' into 'SEA->SFO' (8 chars = 32px):
+    if " > " in route_codes:
+        route_codes = route_codes.replace(" > ", "->")
+    elif ">" in route_codes and "->" not in route_codes:
+        route_codes = route_codes.replace(">", "->")
+    if len(route_codes) > 8:
+        route_codes = route_codes[:8]
 
     # Compute adaptive scroll speed based on BOTH the polling interval and the fragment length.
     # In tom-thumb font, glyph width + inter-glyph spacing is ~4 pixels per character.
